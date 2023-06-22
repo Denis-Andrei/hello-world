@@ -31,6 +31,10 @@ func NewHandlers(r *Repository) {
 // Home is the handler for the home page
 // m is a receiver and now all the handlers have access to the Repository
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
+	remoteIp := r.RemoteAddr
+
+	m.App.Session.Put(r.Context(), "remote_ip", remoteIp)
+
 	render.RenderTemplate(w, "home.page.tmpl", &models.TemplateData{})
 }
 
@@ -40,6 +44,9 @@ func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 	stringMap["test"] = "Hello again"
 
 	// m.App.Session.Cookie = something - we added Session into the config so we can have access to it here
+
+	remoteIp := m.App.Session.GetString(r.Context(), "remote_ip")
+	stringMap["remote_ip"] = remoteIp
 
 	render.RenderTemplate(w, "about.page.tmpl", &models.TemplateData{
 		StringMap: stringMap,
